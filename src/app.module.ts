@@ -5,12 +5,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configModuleConfig, typeOrmAsyncConfig } from './config';
 import { NotificationModule } from './notification/notification.module';
+import { LinkedInModule } from './linkedin/linkedin.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(configModuleConfig),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     NotificationModule,
+    LinkedInModule,
   ],
   controllers: [AppController],
   providers: [AppService],
