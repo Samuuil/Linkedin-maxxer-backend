@@ -6,6 +6,7 @@ export const configModuleConfig: ConfigModuleOptions = {
   validationSchema: Joi.object({
     ENV: Joi.string().valid('DEV', 'PROD').default('DEV'),
     PORT: Joi.number().default(3000),
+    SWAGGER_ENABLED: Joi.boolean().default(true),
 
     DATABASE_HOST: Joi.string().required(),
     DATABASE_NAME: Joi.string().required(),
