@@ -6,11 +6,15 @@ import { AppService } from './app.service';
 import { configModuleConfig, typeOrmAsyncConfig } from './config';
 import { NotificationModule } from './notification/notification.module';
 import { LinkedInModule } from './linkedin/linkedin.module';
+import { AuthModule } from './auth';
+import { UserModule } from './user';
 
 @Module({
   imports: [
     ConfigModule.forRoot(configModuleConfig),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
+    UserModule,
+    AuthModule,
     NotificationModule,
     LinkedInModule,
   ],
