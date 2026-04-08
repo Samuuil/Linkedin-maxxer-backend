@@ -24,10 +24,16 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  const swaggerEnabledValue = configService.get<string>('SWAGGER_ENABLED', 'true');
-  const swaggerEnabled = String(swaggerEnabledValue).toLowerCase();
+  const swaggerEnabledRaw = configService.get<boolean | string>(
+    'SWAGGER_ENABLED',
+    true,
+  );
+  const swaggerEnabled =
+    typeof swaggerEnabledRaw === 'string'
+      ? swaggerEnabledRaw.toLowerCase() === 'true'
+      : Boolean(swaggerEnabledRaw);
 
-  if (swaggerEnabled === 'true') {
+  if (swaggerEnabled) {
     const config = new DocumentBuilder()
       .setTitle('LinkedIn Maxxer API')
       .setDescription('LinkedIn Maxxer Backend API Documentation')
@@ -45,7 +51,7 @@ async function bootstrap() {
 
   await app.listen(port);
   console.log(` Application is running on: http://localhost:${port}`);
-  if (swaggerEnabled === 'true') {
+  if (swaggerEnabled) {
     console.log(` Swagger documentation: http://localhost:${port}/api/docs`);
   }
 }

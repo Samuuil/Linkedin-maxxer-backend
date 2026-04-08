@@ -96,7 +96,7 @@ export class AuthService {
     return user;
   }
 
-  getAuthorizationUrl(state?: string): string {
+  getAuthorizationUrl(): string {
     const clientId = this.configService.get<string>('LINKEDIN_CLIENT_ID');
     const redirectUri =
       this.configService.get<string>('LINKEDIN_REDIRECT_URI') ||
@@ -109,10 +109,6 @@ export class AuthService {
       redirect_uri: redirectUri,
       scope,
     });
-
-    if (state) {
-      params.append('state', state);
-    }
 
     return `https://www.linkedin.com/oauth/v2/authorization?${params.toString()}`;
   }

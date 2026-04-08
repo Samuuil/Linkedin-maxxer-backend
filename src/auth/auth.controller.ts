@@ -36,8 +36,8 @@ export class AuthController {
       },
     },
   })
-  getLinkedInAuthUrl(@Query('state') state?: string): { authorizationUrl: string } {
-    const authorizationUrl = this.authService.getAuthorizationUrl(state);
+  getLinkedInAuthUrl(): { authorizationUrl: string } {
+    const authorizationUrl = this.authService.getAuthorizationUrl();
     return { authorizationUrl };
   }
 
