@@ -24,7 +24,8 @@ export class PostService {
     });
   }
 
-  async postCommentToArticle(
+
+  async createPost(
     refreshToken: string,
     text: string,
     visibility: 'PUBLIC' | 'CONNECTIONS' = 'PUBLIC',

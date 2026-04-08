@@ -23,7 +23,7 @@ export class LinkedInController {
     @Body('text') text: string,
     @Body('visibility') visibility?: 'PUBLIC' | 'CONNECTIONS',
   ) {
-    const postId = await this.postService.postCommentToArticle(
+    const postId = await this.postService.createPost(
       refreshToken,
       text,
       visibility,
