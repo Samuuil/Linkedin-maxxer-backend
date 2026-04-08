@@ -15,12 +15,21 @@ import { LinkedInModule } from '../linkedin/linkedin.module';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRATION') || '7d',
-        },
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        if (!secret) {
+          throw new Error('JWT_SECRET is not defined in environment variables');
+        }
+        
+        const expiresIn = configService.get<string>('JWT_EXPIRATION') || '7d';
+        
+        return {
+          secret,
+          signOptions: {
+            expiresIn: expiresIn as any, // NestJS v11 type issue workaround
+          },
+        };
+      },
       inject: [ConfigService],
     }),
   ],

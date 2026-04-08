@@ -24,9 +24,8 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  const swaggerEnabled = configService
-    .get<string>('SWAGGER_ENABLED', 'true')
-    .toLowerCase();
+  const swaggerEnabledValue = configService.get<string>('SWAGGER_ENABLED', 'true');
+  const swaggerEnabled = String(swaggerEnabledValue).toLowerCase();
 
   if (swaggerEnabled === 'true') {
     const config = new DocumentBuilder()

@@ -8,6 +8,7 @@ import { NotificationModule } from './notification/notification.module';
 import { LinkedInModule } from './linkedin/linkedin.module';
 import { AuthModule } from './auth';
 import { UserModule } from './user';
+import { PostsModule } from './posts';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user';
     AuthModule,
     NotificationModule,
     LinkedInModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
