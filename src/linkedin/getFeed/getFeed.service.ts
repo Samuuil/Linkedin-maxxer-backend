@@ -1,13 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
-import { AuthService } from '../auth/auth.service';
+import { LinkedInAuthService } from '../auth/auth.service';
+import { UserService } from '../../user';
 
 @Injectable()
 export class GetFeedService {
   private readonly logger = new Logger(GetFeedService.name);
   private readonly BASE_URL = 'https://api.linkedin.com/v2';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: LinkedInAuthService,
+    private userService: UserService,
+  ) {}
 
   private createHttpClient(accessToken: string): AxiosInstance {
     return axios.create({
@@ -20,10 +24,16 @@ export class GetFeedService {
     });
   }
 
-  async getFeed(refreshToken: string, count: number = 10): Promise<any> {
+  async getFeed(userId: string, count: number = 10): Promise<any> {
     try {
+      const oficialToken = await this.userService.getOficialToken(userId);
+      if (!oficialToken) {
+        throw new BadRequestException(
+          'User has not connected their LinkedIn account (no official token)',
+        );
+      }
       const { accessToken } =
-        await this.authService.getAccessTokenAndUrn(refreshToken);
+        await this.authService.getAccessTokenAndUrn(oficialToken);
 
       const http = this.createHttpClient(accessToken);
 

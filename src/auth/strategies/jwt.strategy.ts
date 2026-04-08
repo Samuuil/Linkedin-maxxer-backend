@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from '../../user';
-import { JwtPayloadDto } from '../dtos';
+import { TokenPayloadDto } from '../dtos';
 import { User } from '../../user/entities';
 
 @Injectable()
@@ -12,21 +12,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
     private readonly userService: UserService,
   ) {
-    const secret = configService.get<string>('JWT_SECRET');
-    if (!secret) {
-      throw new Error('JWT_SECRET is not defined in environment variables');
-    }
-    
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: secret,
+      secretOrKey: configService.get<string>('JWT_ACCESS_SECRET') || '',
     });
   }
 
-  async validate(payload: JwtPayloadDto): Promise<User> {
-    const user = await this.userService.findById(payload.sub);
-    
+  async validate(payload: TokenPayloadDto): Promise<User> {
+    const user = await this.userService.findByIdAndTokenVersion(
+      payload.id,
+      payload.tokenVersion,
+    );
+
     if (!user) {
       throw new UnauthorizedException('User not found');
     }

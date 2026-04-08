@@ -15,6 +15,13 @@ export const configModuleConfig: ConfigModuleOptions = {
     DATABASE_PORT: Joi.number().required(),
     DATABASE_LOGGING: Joi.boolean().default(false),
 
+    JWT_ACCESS_SECRET: Joi.string().required(),
+    JWT_ACCESS_EXPIRES_IN: Joi.string().default('1d'),
+    JWT_REFRESH_SECRET: Joi.string().required(),
+    JWT_REFRESH_EXPIRES_IN: Joi.string().default('30d'),
+
+    ENCRYPTION_KEY: Joi.string().length(64).required(),
+
     FIREBASE_PROJECT_ID: Joi.string().required(),
     FIREBASE_CLIENT_EMAIL: Joi.string().required(),
     FIREBASE_PRIVATE_KEY: Joi.string().required().replace(/\\n/g, '\n'),

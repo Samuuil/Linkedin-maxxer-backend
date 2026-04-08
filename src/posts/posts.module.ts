@@ -3,14 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 import { Post } from './entities';
-import { UserModule } from '../user/user.module';
 import { LinkedInModule } from '../linkedin/linkedin.module';
+import { AuthModule } from '../auth';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Post]),
-    UserModule,
     LinkedInModule,
+    AuthModule,
   ],
   controllers: [PostsController],
   providers: [PostsService],

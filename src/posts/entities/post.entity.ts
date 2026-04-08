@@ -25,12 +25,6 @@ export class Post {
   @Column({ type: 'text' })
   text: string;
 
-  @Column({ name: 'image_urns', type: 'jsonb', nullable: true })
-  imageUrns: string[];
-
-  @Column({ name: 'alt_texts', type: 'jsonb', nullable: true })
-  altTexts: string[];
-
   @Column({ name: 'linkedin_post_urn', nullable: true })
   linkedInPostUrn: string;
 

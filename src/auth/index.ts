@@ -5,3 +5,6 @@ export * from './dtos';
 export * from './guards';
 export * from './strategies';
 export * from './decorators';
+export * from './errors';
+export * from './providers';
+export * from './types';

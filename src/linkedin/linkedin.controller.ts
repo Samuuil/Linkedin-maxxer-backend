@@ -1,30 +1,30 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post/postComment.service';
 import { GetFeedService } from './getFeed/getFeed.service';
-import { AuthService } from './auth/auth.service';
+import { JwtAuthGuard } from '../auth/guards';
+import { CurrentUser } from '../auth/decorators';
+import { User } from '../user/entities';
 
+@ApiTags('LinkedIn')
 @Controller('linkedin')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('AccessToken')
 export class LinkedInController {
   constructor(
-    private authService: AuthService,
     private postService: PostService,
     private getFeedService: GetFeedService,
   ) {}
 
-  @Post('auth/token')
-  async getToken(@Body('refreshToken') refreshToken: string) {
-    const result = await this.authService.getAccessTokenAndUrn(refreshToken);
-    return result;
-  }
-
   @Post('post')
+  @ApiOperation({ summary: 'Create a text-only LinkedIn post' })
   async createPost(
-    @Body('refreshToken') refreshToken: string,
+    @CurrentUser() user: User,
     @Body('text') text: string,
     @Body('visibility') visibility?: 'PUBLIC' | 'CONNECTIONS',
   ) {
-    const postId = await this.postService.postCommentToArticle(
-      refreshToken,
+    const postId = await this.postService.createPost(
+      user.id,
       text,
       visibility,
     );
@@ -32,12 +32,13 @@ export class LinkedInController {
   }
 
   @Get('feed')
+  @ApiOperation({ summary: 'Get LinkedIn feed for current user' })
   async getFeed(
-    @Query('refreshToken') refreshToken: string,
+    @CurrentUser() user: User,
     @Query('count') count?: number,
   ) {
     const feed = await this.getFeedService.getFeed(
-      refreshToken,
+      user.id,
       count ? parseInt(count.toString()) : 10,
     );
     return feed;

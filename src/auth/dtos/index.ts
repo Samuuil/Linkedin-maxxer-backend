@@ -1,3 +1,7 @@
+export * from './register.dto';
+export * from './login.dto';
+export * from './token-payload.dto';
+export * from './refresh-token-payload.dto';
 export * from './linkedin-callback.dto';
 export * from './auth-response.dto';
 export * from './update-push-token.dto';

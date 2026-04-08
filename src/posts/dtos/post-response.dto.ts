@@ -11,12 +11,6 @@ export class PostResponseDto {
   @ApiProperty()
   text: string;
 
-  @ApiPropertyOptional({ type: [String] })
-  imageUrns?: string[];
-
-  @ApiPropertyOptional({ type: [String] })
-  altTexts?: string[];
-
   @ApiPropertyOptional()
   linkedInPostUrn?: string;
 

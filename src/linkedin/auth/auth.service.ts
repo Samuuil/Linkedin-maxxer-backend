@@ -7,8 +7,8 @@ import {
 } from '../interfaces/linkedin.interface';
 
 @Injectable()
-export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
+export class LinkedInAuthService {
+  private readonly logger = new Logger(LinkedInAuthService.name);
 
   constructor(private configService: ConfigService) {}
 
@@ -93,81 +93,5 @@ export class AuthService {
     const accessToken = await this.getAccessTokenFromRefreshToken(refreshToken);
     const personUrn = await this.fetchPersonUrn(accessToken);
     return { accessToken, personUrn };
-  }
-
-  async exchangeCodeForTokens(code: string, redirectUri: string): Promise<{
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-  }> {
-    try {
-      const clientId = this.configService.get<string>('LINKEDIN_CLIENT_ID');
-      const clientSecret = this.configService.get<string>(
-        'LINKEDIN_CLIENT_SECRET',
-      );
-
-      if (!clientId || !clientSecret) {
-        throw new Error('LinkedIn credentials not configured');
-      }
-
-      const tokenResponse = await axios.post<LinkedInTokenResponse>(
-        'https://www.linkedin.com/oauth/v2/accessToken',
-        new URLSearchParams({
-          grant_type: 'authorization_code',
-          code,
-          redirect_uri: redirectUri,
-          client_id: clientId,
-          client_secret: clientSecret,
-        }).toString(),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        },
-      );
-
-      const { access_token, refresh_token, expires_in } = tokenResponse.data;
-
-      if (!refresh_token) {
-        throw new Error('No refresh token received from LinkedIn');
-      }
-
-      this.logger.log(
-        `Tokens obtained via authorization code, expires in: ${Math.round(expires_in / 3600)} hours`,
-      );
-
-      return {
-        accessToken: access_token,
-        refreshToken: refresh_token,
-        expiresIn: expires_in,
-      };
-    } catch (error: any) {
-      this.logger.error(
-        'Failed to exchange code for tokens',
-        error.response?.data || error.message,
-      );
-      throw new Error('Failed to exchange authorization code for tokens');
-    }
-  }
-
-  async getUserInfo(accessToken: string): Promise<LinkedInUserInfo> {
-    try {
-      const response = await axios.get<LinkedInUserInfo>(
-        'https://api.linkedin.com/v2/userinfo',
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-
-      return response.data;
-    } catch (error: any) {
-      this.logger.error(
-        'Failed to fetch user info',
-        error.response?.data || error.message,
-      );
-      throw new Error('Failed to fetch LinkedIn user information');
-    }
   }
 }

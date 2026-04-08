@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuthService } from './auth/auth.service';
+import { LinkedInAuthService } from './auth/auth.service';
 import { PostService } from './post/postComment.service';
 import { GetFeedService } from './getFeed/getFeed.service';
-import { LinkedInPostsService } from './posts/linkedin-posts.service';
 import { LinkedInController } from './linkedin.controller';
+import { UserModule } from '../user';
+import { AuthModule } from '../auth';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, UserModule, AuthModule],
   controllers: [LinkedInController],
-  providers: [AuthService, PostService, GetFeedService, LinkedInPostsService],
-  exports: [AuthService, PostService, GetFeedService, LinkedInPostsService],
+  providers: [LinkedInAuthService, PostService, GetFeedService],
+  exports: [LinkedInAuthService, PostService, GetFeedService],
 })
 export class LinkedInModule {}

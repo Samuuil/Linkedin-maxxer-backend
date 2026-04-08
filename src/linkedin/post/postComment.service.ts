@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
-import { AuthService } from '../auth/auth.service';
+import { LinkedInAuthService } from '../auth/auth.service';
+import { UserService } from '../../user';
 import {
   CreatePostPayload,
   CreatePostResponse,
@@ -11,7 +12,10 @@ export class PostService {
   private readonly logger = new Logger(PostService.name);
   private readonly BASE_URL = 'https://api.linkedin.com/v2';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: LinkedInAuthService,
+    private userService: UserService,
+  ) {}
 
   private createHttpClient(accessToken: string): AxiosInstance {
     return axios.create({
@@ -24,15 +28,20 @@ export class PostService {
     });
   }
 
-  async postCommentToArticle(
-    refreshToken: string,
+  async createPost(
+    userId: string,
     text: string,
     visibility: 'PUBLIC' | 'CONNECTIONS' = 'PUBLIC',
   ): Promise<string> {
     try {
-      // Get access token and person URN from refresh token
+      const oficialToken = await this.userService.getOficialToken(userId);
+      if (!oficialToken) {
+        throw new BadRequestException(
+          'User has not connected their LinkedIn account (no official token)',
+        );
+      }
       const { accessToken, personUrn } =
-        await this.authService.getAccessTokenAndUrn(refreshToken);
+        await this.authService.getAccessTokenAndUrn(oficialToken);
 
       const http = this.createHttpClient(accessToken);
 
@@ -55,7 +64,6 @@ export class PostService {
         payload,
       );
 
-      // LinkedIn returns the new post URN in the X-RestLi-Id header or in data.id
       const postId: string =
         (headers['x-restli-id'] as string) || data.id || '';
 
