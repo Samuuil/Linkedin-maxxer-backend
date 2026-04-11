@@ -25,5 +25,13 @@ export const configModuleConfig: ConfigModuleOptions = {
     FIREBASE_PROJECT_ID: Joi.string().required(),
     FIREBASE_CLIENT_EMAIL: Joi.string().required(),
     FIREBASE_PRIVATE_KEY: Joi.string().required().replace(/\\n/g, '\n'),
+
+    UNIPILE_API_URL: Joi.string()
+      .uri()
+      .default('https://api32.unipile.com:16266'),
+    UNIPILE_ACCESS_TOKEN: Joi.string().optional(),
+
+    APIFY_API_URL: Joi.string().uri().default('https://api.apify.com'),
+    APIFY_API_TOKEN: Joi.string().optional(),
   }),
 };

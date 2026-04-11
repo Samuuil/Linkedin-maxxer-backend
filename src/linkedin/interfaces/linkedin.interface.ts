@@ -29,3 +29,61 @@ export interface CreatePostPayload {
 export interface CreatePostResponse {
   id: string;
 }
+
+export interface LinkedInUserPostUrn {
+  activity_urn: string;
+  share_urn: string;
+  ugcPost_urn: string | null;
+}
+
+export interface LinkedInUserPostDate {
+  date: string;
+  relative: string;
+  timestamp: number;
+}
+
+export interface LinkedInUserPostAuthor {
+  first_name: string;
+  last_name: string;
+  headline: string;
+  username: string;
+  profile_url: string;
+  profile_picture: string;
+}
+
+export interface LinkedInUserPostStats {
+  total_reactions: number;
+  like: number;
+  support: number;
+  love: number;
+  insight: number;
+  celebrate: number;
+  funny: number;
+  comments: number;
+  reposts: number;
+}
+
+export interface LinkedInUserPostMediaImage {
+  url: string;
+  width: number;
+  height: number;
+}
+
+export interface LinkedInUserPostMedia {
+  type: string;
+  url?: string;
+  images?: LinkedInUserPostMediaImage[];
+}
+
+export interface LinkedInUserPost extends Record<string, unknown> {
+  urn: LinkedInUserPostUrn;
+  full_urn: string;
+  posted_at: LinkedInUserPostDate;
+  text: string;
+  url: string;
+  post_type: string;
+  author: LinkedInUserPostAuthor;
+  stats: LinkedInUserPostStats;
+  media?: LinkedInUserPostMedia;
+  pagination_token: string;
+}
