@@ -110,10 +110,12 @@ export class PostService {
           'User has not connected their LinkedIn account (no official token)',
         );
       }
-      const { accessToken, personUrn } =
-        await this.linkedInAuthService.getAccessTokenAndUrn(oficialToken);
+      
+      console.log(oficialToken)
+      const personUrn =
+        await this.linkedInAuthService.fetchPersonUrn(oficialToken);
 
-      const http = this.createHttpClient(accessToken);
+      const http = this.createHttpClient(oficialToken);
 
       const payload: CreatePostPayload = {
         author: personUrn,

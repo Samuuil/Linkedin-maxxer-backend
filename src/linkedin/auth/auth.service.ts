@@ -16,9 +16,9 @@ export class LinkedInAuthService {
     refreshToken: string,
   ): Promise<string> {
     try {
-      const clientId = this.configService.get<string>('LINKEDIN_CLIENT_ID');
+      const clientId = this.configService.get<string>('LINKED_IN_APP_ACCESS_TOKEN');
       const clientSecret = this.configService.get<string>(
-        'LINKEDIN_CLIENT_SECRET',
+        'LINKEDIN_APP_CLIENT_SECRET',
       );
 
       if (!clientId || !clientSecret) {
@@ -28,10 +28,11 @@ export class LinkedInAuthService {
       const tokenResponse = await axios.post<LinkedInTokenResponse>(
         'https://www.linkedin.com/oauth/v2/accessToken',
         new URLSearchParams({
-          grant_type: 'refresh_token',
-          refresh_token: refreshToken,
+          grant_type: 'authorization_code',
+          code: refreshToken,
           client_id: clientId,
           client_secret: clientSecret,
+          redirect_uri: "https://www.linkedin.com/developers/tools/oauth/redirect"
         }).toString(),
         {
           headers: {
@@ -92,6 +93,7 @@ export class LinkedInAuthService {
   ): Promise<{ accessToken: string; personUrn: string }> {
     const accessToken = await this.getAccessTokenFromRefreshToken(refreshToken);
     const personUrn = await this.fetchPersonUrn(accessToken);
+    console.log("token", accessToken, personUrn)
     return { accessToken, personUrn };
   }
 }

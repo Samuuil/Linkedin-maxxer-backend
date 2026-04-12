@@ -20,6 +20,7 @@ export class OpenAiService {
   }
 
   async generateComment(postDescription: string): Promise<string> {
+    try {
     const response = await this.client.chat.completions.create({
       model: 'gpt-4o',
       messages: [
@@ -29,6 +30,9 @@ export class OpenAiService {
     });
 
     return response.choices[0].message.content ?? '';
+  }catch(err) {
+    return "your-api-isnt-working-returning-this-sothat-you-stll-go-on"  
+  }
   }
 
   async enhancePostDescription(description: string): Promise<string> {

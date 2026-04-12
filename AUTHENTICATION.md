@@ -258,8 +258,8 @@ Ensure these are set in your `.env` file:
 
 ```env
 # LinkedIn API Configuration
-LINKEDIN_CLIENT_ID=your_client_id_here
-LINKEDIN_CLIENT_SECRET=your_client_secret_here
+LINKED_IN_APP_ACCESS_TOKEN=your_client_id_here
+LINKEDIN_APP_CLIENT_SECRET=your_client_secret_here
 LINKEDIN_REDIRECT_URI=https://www.linkedin.com/developers/tools/oauth/redirect
 
 # JWT Configuration
@@ -318,7 +318,7 @@ The JWT token contains:
 - User must grant email permission during OAuth flow
 
 ### "Failed to authenticate with LinkedIn"
-- Check that `LINKEDIN_CLIENT_ID` and `LINKEDIN_CLIENT_SECRET` are correct
+- Check that `LINKED_IN_APP_ACCESS_TOKEN` and `LINKEDIN_APP_CLIENT_SECRET` are correct
 - Verify the authorization code hasn't expired (codes expire quickly)
 - Ensure redirect URI matches exactly what's configured in LinkedIn app
 

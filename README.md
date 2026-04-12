@@ -105,8 +105,8 @@ All services use the `AuthService` to automatically obtain access tokens and per
 
 Required environment variables:
 
-- `LINKEDIN_CLIENT_ID` - Your LinkedIn app client ID
-- `LINKEDIN_CLIENT_SECRET` - Your LinkedIn app client secret
+- `LINKED_IN_APP_ACCESS_TOKEN` - Your LinkedIn app client ID
+- `LINKEDIN_APP_CLIENT_SECRET` - Your LinkedIn app client secret
 - `DB_HOST` - Database host
 - `DB_PORT` - Database port
 - `DB_USERNAME` - Database username

@@ -77,7 +77,7 @@ export class AuthService {
   }
 
   getLinkedinAuthorizationUrl(): string {
-    const clientId = this.configService.get<string>('LINKEDIN_CLIENT_ID');
+    const clientId = this.configService.get<string>('LINKED_IN_APP_ACCESS_TOKEN');
     const redirectUri =
       this.configService.get<string>('LINKEDIN_REDIRECT_URI') ||
       'https://www.linkedin.com/developers/tools/oauth/redirect';
