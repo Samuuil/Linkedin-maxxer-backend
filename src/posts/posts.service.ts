@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostService as LinkedInPostService } from '../linkedin/post/postComment.service';
+import { OpenAiService } from '../openai';
 import { CreatePostDto } from './dtos';
 import { Post } from './entities';
 import { PostStatus } from './enums';
@@ -19,6 +20,7 @@ export class PostsService {
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
     private readonly linkedInPostService: LinkedInPostService,
+    private readonly openAiService: OpenAiService,
   ) {}
 
   async createPost(userId: string, dto: CreatePostDto): Promise<Post> {
@@ -64,6 +66,10 @@ export class PostsService {
         'Failed to create LinkedIn post: ' + error.message,
       );
     }
+  }
+
+  async enhanceDescription(description: string): Promise<string> {
+    return this.openAiService.enhancePostDescription(description);
   }
 
   async getUserPosts(userId: string): Promise<Post[]> {

@@ -38,6 +38,7 @@ lerna-debug.log*
 
 # Prompt files (contain sensitive prompt content)
 prompts/comment-prompt.txt
+prompts/post-description-prompt.txt
 
 # dotenv environment variable files
 .env
