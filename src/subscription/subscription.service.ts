@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { SubscriptionRepository } from './subscription.repository';
 import { CommentSuggestionRepository } from './comment-suggestion.repository';
-import { LinkedInProfileService } from '../linkedin/profile/profile.service';
+import { PostService } from '../linkedin/post/postComment.service';
 import { CommentSuggestionStatus } from './enums';
 
 @Injectable()
@@ -13,15 +13,14 @@ export class SubscriptionService {
   constructor(
     private readonly subscriptionRepository: SubscriptionRepository,
     private readonly commentSuggestionRepository: CommentSuggestionRepository,
-    private readonly linkedInProfileService: LinkedInProfileService,
+    private readonly postService: PostService,
   ) {}
 
   async subscribe(userId: string, linkedinUrl: string) {
     const username = this.extractUsername(linkedinUrl);
 
-    const person =
-      await this.linkedInProfileService.lookupPersonByUsername(username);
-    if (!person) {
+    const posts = await this.postService.getUserPosts(username, 1);
+    if (!posts.length) {
       throw new BadRequestException('LinkedIn user not found');
     }
 
@@ -80,7 +79,7 @@ export class SubscriptionService {
     }
 
     if (approve) {
-      await this.linkedInProfileService.postCommentToPost(
+      await this.postService.commentOnPost(
         suggestion.linkedinPostId,
         suggestion.suggestedComment,
       );
@@ -108,12 +107,9 @@ export class SubscriptionService {
   }
 
   private extractUsername(linkedinUrl: string): string {
-    const match = linkedinUrl.match(
-      /linkedin\.com\/in\/([a-zA-Z0-9_-]+)/,
-    );
+    const match = linkedinUrl.match(/linkedin\.com\/in\/([a-zA-Z0-9_-]+)/);
     if (match) return match[1];
 
-    // If it's just a username string
     const cleaned = linkedinUrl.replace(/\/$/, '').trim();
     const lastSegment = cleaned.split('/').pop();
     if (lastSegment) return lastSegment;

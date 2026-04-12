@@ -2,10 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { SubscriptionRepository } from './subscription.repository';
 import { CommentSuggestionRepository } from './comment-suggestion.repository';
-import {
-  LinkedInProfileService,
-  LinkedInPost,
-} from '../linkedin/profile/profile.service';
+import { PostService } from '../linkedin/post/postComment.service';
+import { LinkedInUserPost } from '../linkedin/interfaces/linkedin.interface';
 import { OpenAiService } from '../openai';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationTypeEnum } from '../notification/enums';
@@ -20,7 +18,7 @@ export class SubscriptionCronService {
   constructor(
     private readonly subscriptionRepository: SubscriptionRepository,
     private readonly commentSuggestionRepository: CommentSuggestionRepository,
-    private readonly linkedInProfileService: LinkedInProfileService,
+    private readonly postService: PostService,
     private readonly openAiService: OpenAiService,
     private readonly notificationService: NotificationService,
     private readonly userService: UserService,
@@ -30,8 +28,7 @@ export class SubscriptionCronService {
   async processSubscriptions() {
     this.logger.log('Starting subscription cron job');
 
-    const userIds =
-      await this.subscriptionRepository.getAllUniqueUserIds();
+    const userIds = await this.subscriptionRepository.getAllUniqueUserIds();
 
     for (const userId of userIds) {
       try {
@@ -70,21 +67,21 @@ export class SubscriptionCronService {
     pushToken: string,
     subscription: Subscription,
   ) {
-    const posts =
-      await this.linkedInProfileService.getUserPostsByUsername(
-        subscription.linkedinUsername,
-      );
+    const posts = await this.postService.getUserPosts(
+      subscription.linkedinUsername,
+    );
 
     const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
     const recentPosts = posts.filter(
-      (post: LinkedInPost) => new Date(post.createdAt) > fifteenMinutesAgo,
+      (post: LinkedInUserPost) =>
+        new Date(post.posted_at.timestamp) > fifteenMinutesAgo,
     );
 
     for (const post of recentPosts) {
       const alreadyProcessed =
         await this.commentSuggestionRepository.existsByPostAndUser(
           subscription.userId,
-          post.postId,
+          post.url,
         );
       if (alreadyProcessed) continue;
 
@@ -94,7 +91,7 @@ export class SubscriptionCronService {
 
       const suggestion = this.commentSuggestionRepository.create({
         userId: subscription.userId,
-        linkedinPostId: post.postId,
+        linkedinPostId: post.url,
         linkedinUsername: subscription.linkedinUsername,
         postDescription: post.text,
         suggestedComment,
@@ -106,10 +103,7 @@ export class SubscriptionCronService {
       await this.commentSuggestionRepository.save(suggestion);
 
       if (subscription.autoComment) {
-        await this.linkedInProfileService.postCommentToPost(
-          post.postId,
-          suggestedComment,
-        );
+        await this.postService.commentOnPost(post.url, suggestedComment);
       } else if (pushToken) {
         await this.notificationService.sendToToken(
           pushToken,
