@@ -9,6 +9,7 @@ import { LinkedInModule } from './linkedin/linkedin.module';
 import { AuthModule } from './auth';
 import { UserModule } from './user';
 import { PostsModule } from './posts';
+import { SubscriptionModule } from './subscription';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PostsModule } from './posts';
     NotificationModule,
     LinkedInModule,
     PostsModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

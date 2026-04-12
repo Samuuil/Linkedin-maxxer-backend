@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '../auth/guards';
 import { CurrentUser } from '../auth/decorators';
 import { User } from '../user/entities';
 import { PostsService } from './posts.service';
-import { CreatePostDto, PostResponseDto } from './dtos';
+import { CreatePostDto, PostResponseDto, EnhanceDescriptionDto } from './dtos';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -25,6 +25,22 @@ import { CreatePostDto, PostResponseDto } from './dtos';
 @ApiBearerAuth('AccessToken')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
+
+  @Post('enhance')
+  @ApiOperation({
+    summary: 'Enhance a post description with AI',
+    description:
+      'Runs the raw description through OpenAI and returns the improved version. Use the returned text as input to POST /posts.',
+  })
+  @ApiResponse({ status: 200, description: 'Enhanced description returned' })
+  async enhanceDescription(
+    @Body() dto: EnhanceDescriptionDto,
+  ): Promise<{ description: string }> {
+    const description = await this.postsService.enhanceDescription(
+      dto.description,
+    );
+    return { description };
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a text-only LinkedIn post' })
