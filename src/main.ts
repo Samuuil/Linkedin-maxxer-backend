@@ -1,20 +1,31 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors({ origin: true, credentials: true });
+  const configService = app.get(ConfigService);
+  const baseUrl = configService.get<string>(
+    'BASE_URL',
+    'http://localhost:3000',
+  );
+  const fallbackPort = configService.get<number>('PORT', 3000);
+  const apiPrefix = configService.get<string>('API_PREFIX', 'api');
 
-  app.setGlobalPrefix('api');
+  const url = new URL(baseUrl);
+  const host = url.hostname;
+  const port = url.port ? parseInt(url.port, 10) : fallbackPort;
+
+  app.setGlobalPrefix(apiPrefix);
 
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       whitelist: true,
+      forbidNonWhitelisted: false,
       forbidUnknownValues: false,
       transformOptions: {
         enableImplicitConversion: true,
@@ -22,18 +33,13 @@ async function bootstrap() {
     }),
   );
 
-  const configService = app.get(ConfigService);
-
-  const swaggerEnabledRaw = configService.get<boolean | string>(
+  const swaggerEnabledValue = configService.get<string>(
     'SWAGGER_ENABLED',
-    true,
+    'true',
   );
-  const swaggerEnabled =
-    typeof swaggerEnabledRaw === 'string'
-      ? swaggerEnabledRaw.toLowerCase() === 'true'
-      : Boolean(swaggerEnabledRaw);
+  const swaggerEnabled = String(swaggerEnabledValue).toLowerCase();
 
-  if (swaggerEnabled) {
+  if (swaggerEnabled === 'true') {
     const config = new DocumentBuilder()
       .setTitle('LinkedIn Maxxer API')
       .setDescription('LinkedIn Maxxer Backend API Documentation')
@@ -42,17 +48,12 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document, {
-      jsonDocumentUrl: '/api/docs-json',
+    SwaggerModule.setup(`${apiPrefix}/docs`, app, document, {
+      jsonDocumentUrl: `/${apiPrefix}/docs-json`,
     });
   }
 
-  const port = configService.get<number>('PORT') || 3000;
-
-  await app.listen(port);
-  console.log(` Application is running on: http://localhost:${port}`);
-  if (swaggerEnabled) {
-    console.log(` Swagger documentation: http://localhost:${port}/api/docs`);
-  }
+  await app.listen(port, host);
 }
+
 bootstrap();
