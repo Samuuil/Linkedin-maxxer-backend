@@ -17,7 +17,12 @@ import { JwtAuthGuard } from '../auth/guards';
 import { CurrentUser } from '../auth/decorators';
 import { User } from '../user/entities';
 import { PostsService } from './posts.service';
-import { CreatePostDto, PostResponseDto, EnhanceDescriptionDto } from './dtos';
+import {
+  CommentOnPostDto,
+  CreatePostDto,
+  EnhanceDescriptionDto,
+  PostResponseDto,
+} from './dtos';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -67,6 +72,17 @@ export class PostsController {
   })
   async getUserPosts(@CurrentUser() user: User): Promise<PostResponseDto[]> {
     return this.postsService.getUserPosts(user.id);
+  }
+
+  @Post('comment')
+  @ApiOperation({
+    summary: 'Generate and publish a comment under a LinkedIn post',
+  })
+  @ApiResponse({ status: 201, description: 'Comment published successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async commentOnPost(@Body() dto: CommentOnPostDto) {
+    return this.postsService.commentOnPost(dto);
   }
 
   @Get(':id')

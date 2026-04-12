@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostService as LinkedInPostService } from '../linkedin/post/postComment.service';
 import { OpenAiService } from '../openai';
-import { CreatePostDto } from './dtos';
+import { CommentOnPostDto, CreatePostDto } from './dtos';
 import { Post } from './entities';
 import { PostStatus } from './enums';
 
@@ -70,6 +70,27 @@ export class PostsService {
 
   async enhanceDescription(description: string): Promise<string> {
     return this.openAiService.enhancePostDescription(description);
+  }
+
+  async commentOnPost(dto: CommentOnPostDto) {
+    try {
+      console.log("de")
+      const post = await this.linkedInPostService.getPost(dto.urn);
+      console.log(post)
+      // const comment = await this.openAiService.generateComment(postText);
+      const comment = "amazing insight"
+      const result = await this.linkedInPostService.commentOnPost(
+        dto.urn,
+        comment,
+      );
+
+      return { comment, result };
+    } catch (error: any) {
+      this.logger.error('Failed to comment on LinkedIn post', error.message);
+      throw new BadRequestException(
+        'Failed to comment on LinkedIn post: ' + error.message,
+      );
+    }
   }
 
   async getUserPosts(userId: string): Promise<Post[]> {

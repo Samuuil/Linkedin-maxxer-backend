@@ -35,11 +35,11 @@ export class PostService {
     });
   }
 
-  async commentOnPost(postUrl: string, commentText: string) {
-    const activityId = postUrl.match(/activity-(\d+)/)?.[1];
+  async getPost(urn: string) {
+    const activityId = urn
     if (!activityId) {
       throw new Error(
-        `Could not extract LinkedIn activity id from URL: ${postUrl}`,
+        `Could not extract LinkedIn activity id from URL: ${urn}`,
       );
     }
 
@@ -56,11 +56,35 @@ export class PostService {
     if (!linkedinAccId) {
       throw new Error('No LinkedIn account found in Unipile');
     }
+    console.log("frijfmr")
 
-    const post = await unipileClient.users.getPost({
+    try{
+    const res =  await unipileClient.users.getPost({
       account_id: linkedinAccId,
       post_id: activityId,
     });
+    console.log("deedde", res)
+    return res
+    }catch(e){
+      console.log(e)
+      throw new Error(e)
+    }
+  }
+
+  async commentOnPost(urn: string, commentText: string) {
+    const post = await this.getPost(urn);
+    const unipileAccessToken = this.getRequiredConfig('UNIPILE_ACCESS_TOKEN');
+    const unipileBaseUrl =
+      this.configService.get<string>('UNIPILE_API_URL') ??
+      'https://api32.unipile.com:16266';
+    const unipileClient = new UnipileClient(unipileBaseUrl, unipileAccessToken);
+    const linkedinAccId = (await unipileClient.account.getAll()).items.find(
+      (acc) => acc.type === 'LINKEDIN',
+    )?.id;
+
+    if (!linkedinAccId) {
+      throw new Error('No LinkedIn account found in Unipile');
+    }
 
     if (!post.permissions.can_post_comments) {
       throw new Error(`Comments are not allowed on post ${post.id}.`);
