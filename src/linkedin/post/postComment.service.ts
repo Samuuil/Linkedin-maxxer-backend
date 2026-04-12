@@ -22,7 +22,7 @@ export class PostService {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   private createHttpClient(accessToken: string): AxiosInstance {
     return axios.create({
@@ -58,14 +58,14 @@ export class PostService {
     }
     console.log("frijfmr")
 
-    try{
-    const res =  await unipileClient.users.getPost({
-      account_id: linkedinAccId,
-      post_id: activityId,
-    });
-    console.log("deedde", res)
-    return res
-    }catch(e){
+    try {
+      const res = await unipileClient.users.getPost({
+        account_id: linkedinAccId,
+        post_id: activityId,
+      });
+      console.log("deedde", res)
+      return res
+    } catch (e) {
       console.log(e)
       throw new Error(e)
     }
@@ -134,7 +134,7 @@ export class PostService {
           'User has not connected their LinkedIn account (no official token)',
         );
       }
-      
+
       console.log(oficialToken)
       const personUrn =
         await this.linkedInAuthService.fetchPersonUrn(oficialToken);
