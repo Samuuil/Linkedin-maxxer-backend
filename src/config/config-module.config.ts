@@ -25,5 +25,7 @@ export const configModuleConfig: ConfigModuleOptions = {
     FIREBASE_PROJECT_ID: Joi.string().required(),
     FIREBASE_CLIENT_EMAIL: Joi.string().required(),
     FIREBASE_PRIVATE_KEY: Joi.string().required().replace(/\\n/g, '\n'),
+
+    OPENAI_API_KEY: Joi.string().required(),
   }),
 };

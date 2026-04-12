@@ -3,5 +3,5 @@ export enum NotificationTypeEnum {
   System = 'system',
   Alert = 'alert',
   Info = 'info',
-  // Add more types as needed
+  CommentSuggestion = 'comment_suggestion',
 }
