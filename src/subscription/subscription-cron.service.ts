@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { SubscriptionRepository } from './subscription.repository';
 import { CommentSuggestionRepository } from './comment-suggestion.repository';
 import { PostService } from '../linkedin/post/postComment.service';
@@ -24,7 +24,7 @@ export class SubscriptionCronService {
     private readonly userService: UserService,
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron('0 */15 * * * *')
   async processSubscriptions() {
     this.logger.log('Starting subscription cron job');
 
