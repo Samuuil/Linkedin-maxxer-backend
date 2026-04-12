@@ -16,7 +16,6 @@ async function bootstrap() {
   const apiPrefix = configService.get<string>('API_PREFIX', 'api');
 
   const url = new URL(baseUrl);
-  const host = url.hostname;
   const port = url.port ? parseInt(url.port, 10) : fallbackPort;
 
   app.setGlobalPrefix(apiPrefix);
@@ -53,7 +52,7 @@ async function bootstrap() {
     });
   }
 
-  await app.listen(port, host);
+  await app.listen(port, '0.0.0.0');
 }
 
 bootstrap();
