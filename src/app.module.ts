@@ -11,6 +11,7 @@ import { AuthModule } from './auth';
 import { UserModule } from './user';
 import { PostsModule } from './posts';
 import { SubscriptionModule } from './subscription';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SubscriptionModule } from './subscription';
     LinkedInModule,
     PostsModule,
     SubscriptionModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
