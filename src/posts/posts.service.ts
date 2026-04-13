@@ -5,6 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  FilterOperator,
+  paginate,
+} from 'nestjs-paginate';
+import type { PaginateQuery, Paginated } from 'nestjs-paginate';
 import { Repository } from 'typeorm';
 import { PostService as LinkedInPostService } from '../linkedin/post/postComment.service';
 import { OpenAiService } from '../openai';
@@ -93,10 +98,21 @@ export class PostsService {
     }
   }
 
-  async getUserPosts(userId: string): Promise<Post[]> {
-    return this.postsRepository.find({
-      where: { userId },
-      order: { createdAt: 'DESC' },
+  async getUserPosts(
+    userId: string,
+    query: PaginateQuery,
+  ): Promise<Paginated<Post>> {
+    return paginate(query, this.postsRepository, {
+      sortableColumns: ['createdAt', 'status'],
+      filterableColumns: {
+        status: [FilterOperator.EQ],
+      },
+      defaultSortBy: [['createdAt', 'DESC']],
+      defaultLimit: 20,
+      maxLimit: 100,
+      where: {
+        userId,
+      },
     });
   }
 

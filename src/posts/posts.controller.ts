@@ -10,9 +10,12 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Paginate } from 'nestjs-paginate';
+import type { PaginateQuery, Paginated } from 'nestjs-paginate';
 import { JwtAuthGuard } from '../auth/guards';
 import { CurrentUser } from '../auth/decorators';
 import { User } from '../user/entities';
@@ -21,8 +24,10 @@ import {
   CommentOnPostDto,
   CreatePostDto,
   EnhanceDescriptionDto,
+  PostsQueryDto,
   PostResponseDto,
 } from './dtos';
+import { Post as PostEntity } from './entities';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -64,14 +69,19 @@ export class PostsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all posts for the current user' })
+  @ApiQuery({ type: PostsQueryDto })
+  @ApiOperation({
+    summary: 'Get user posts with pagination and optional status filter',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Posts retrieved successfully',
-    type: [PostResponseDto],
+    description: 'Paginated posts retrieved successfully',
   })
-  async getUserPosts(@CurrentUser() user: User): Promise<PostResponseDto[]> {
-    return this.postsService.getUserPosts(user.id);
+  async getUserPosts(
+    @CurrentUser() user: User,
+    @Paginate() query: PaginateQuery,
+  ): Promise<Paginated<PostEntity>> {
+    return this.postsService.getUserPosts(user.id, query);
   }
 
   @Post('comment')
