@@ -22,7 +22,7 @@ export class OpenAiService {
   async generateComment(postDescription: string): Promise<string> {
     try {
     const response = await this.client.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-5-nano',
       messages: [
         { role: 'system', content: this.commentPrompt },
         { role: 'user', content: postDescription },
@@ -37,7 +37,7 @@ export class OpenAiService {
 
   async enhancePostDescription(description: string): Promise<string> {
     const response = await this.client.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-5-nano',
       messages: [
         { role: 'system', content: this.postDescriptionPrompt },
         { role: 'user', content: description },
