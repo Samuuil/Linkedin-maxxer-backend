@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import * as fs from 'fs';
@@ -6,6 +6,7 @@ import * as path from 'path';
 
 @Injectable()
 export class OpenAiService {
+  private readonly logger = new Logger(OpenAiService.name);
   private readonly client: OpenAI;
   private readonly commentPrompt: string;
   private readonly postDescriptionPrompt: string;
@@ -20,19 +21,20 @@ export class OpenAiService {
   }
 
   async generateComment(postDescription: string): Promise<string> {
-    try {
+    this.logger.debug(`Generating comment for post: "${postDescription.substring(0, 100)}..."`);
+    this.logger.debug(`Using system prompt (${this.commentPrompt.length} chars)`);
+
     const response = await this.client.chat.completions.create({
-      model: 'gpt-5-nano',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: this.commentPrompt },
         { role: 'user', content: postDescription },
       ],
     });
 
-    return response.choices[0].message.content ?? '';
-  }catch(err) {
-    return "your-api-isnt-working-returning-this-sothat-you-stll-go-on"  
-  }
+    const comment = response.choices[0].message.content ?? '';
+    this.logger.log(`Generated comment: "${comment}"`);
+    return comment;
   }
 
   async enhancePostDescription(description: string): Promise<string> {

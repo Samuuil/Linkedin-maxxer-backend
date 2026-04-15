@@ -100,11 +100,16 @@ export class LinkedinPostService {
       throw new Error(`Comments are not allowed on post ${post.id}.`);
     }
 
-    return unipileClient.users.sendPostComment({
+    this.logger.log(`Posting comment on post ${post.id} (account ${linkedinAccId}): "${commentText}"`);
+
+    const result = await unipileClient.users.sendPostComment({
       account_id: linkedinAccId,
       post_id: post.id,
       text: commentText,
     });
+
+    this.logger.log(`sendPostComment result: ${JSON.stringify(result)}`);
+    return result;
   }
 
   /*
