@@ -24,7 +24,7 @@ export class SubscriptionCronService {
     private readonly userService: UserService,
   ) {}
 
-  @Cron('0 */15 * * * *')
+  @Cron('0 */1 * * * *')
   async processSubscriptions() {
     this.logger.log('Starting subscription cron job');
 
@@ -112,9 +112,7 @@ export class SubscriptionCronService {
           post.url,
         );
 
-      this.logger.log(
-        `Post ${post.url} alreadyProcessed=${alreadyProcessed}`,
-      );
+      this.logger.log(`Post ${post.url} alreadyProcessed=${alreadyProcessed}`);
 
       if (alreadyProcessed) continue;
 
