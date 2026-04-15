@@ -24,7 +24,7 @@ export class SubscriptionCronService {
     private readonly userService: UserService,
   ) {}
 
-  @Cron('0 */1 * * * *')
+  @Cron('0 */10 * * * *')
   async processSubscriptions() {
     this.logger.log('Starting subscription cron job');
 
