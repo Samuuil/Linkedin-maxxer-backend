@@ -77,16 +77,14 @@ export class PostsService {
     return this.openAiService.enhancePostDescription(description);
   }
 
-  async commentOnPost(dto: CommentOnPostDto) {
+  async commentOnPost(dto: CommentOnPostDto, userId: string) {
     try {
-      console.log("de")
-      const post = await this.linkedInPostService.getPost(dto.urn);
-      console.log(post)
       // const comment = await this.openAiService.generateComment(postText);
-      const comment = "amazing insight"
+      const comment = 'amazing insight';
       const result = await this.linkedInPostService.commentOnPost(
         dto.urn,
         comment,
+        userId,
       );
 
       return { comment, result };

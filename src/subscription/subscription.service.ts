@@ -82,6 +82,7 @@ export class SubscriptionService {
       await this.postService.commentOnPost(
         suggestion.linkedinPostId,
         suggestion.suggestedComment,
+        userId,
       );
       suggestion.status = CommentSuggestionStatus.APPROVED;
     } else {

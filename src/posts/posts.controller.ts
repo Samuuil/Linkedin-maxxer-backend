@@ -91,8 +91,11 @@ export class PostsController {
   @ApiResponse({ status: 201, description: 'Comment published successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async commentOnPost(@Body() dto: CommentOnPostDto) {
-    return this.postsService.commentOnPost(dto);
+  async commentOnPost(
+    @CurrentUser() user: User,
+    @Body() dto: CommentOnPostDto,
+  ) {
+    return this.postsService.commentOnPost(dto, user.id);
   }
 
   @Get(':id')

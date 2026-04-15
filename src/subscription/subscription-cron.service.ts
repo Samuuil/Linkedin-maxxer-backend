@@ -103,7 +103,11 @@ export class SubscriptionCronService {
       await this.commentSuggestionRepository.save(suggestion);
 
       if (subscription.autoComment) {
-        await this.postService.commentOnPost(post.url, suggestedComment);
+        await this.postService.commentOnPost(
+          post.url,
+          suggestedComment,
+          subscription.userId,
+        );
       } else if (pushToken) {
         await this.notificationService.sendToToken(
           pushToken,
