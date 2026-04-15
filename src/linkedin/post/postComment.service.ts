@@ -35,8 +35,18 @@ export class LinkedinPostService {
     });
   }
 
+  private extractActivityId(urn: string): string {
+    // Full URL: https://www.linkedin.com/posts/...-activity-7450228167287566336-bJBA?...
+    const match = urn.match(/activity-(\d+)/);
+    if (match) return match[1];
+    // Already a bare numeric ID or URN
+    const numericMatch = urn.match(/(\d{15,})/);
+    if (numericMatch) return numericMatch[1];
+    throw new Error(`Could not extract LinkedIn activity id from: ${urn}`);
+  }
+
   async getPost(urn: string, userId: string) {
-    const activityId = urn;
+    const activityId = this.extractActivityId(urn);
     if (!activityId) {
       throw new Error(
         `Could not extract LinkedIn activity id from URL: ${urn}`,
