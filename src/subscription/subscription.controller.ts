@@ -34,7 +34,7 @@ export class SubscriptionController {
     @CurrentUser() user: User,
     @Body() dto: SubscribeDto,
   ) {
-    return this.subscriptionService.subscribe(user.id, dto.linkedinUrl);
+    return this.subscriptionService.subscribe(user.id, dto.username);
   }
 
   @Delete(':id')

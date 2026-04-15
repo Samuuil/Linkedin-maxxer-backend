@@ -16,8 +16,7 @@ export class SubscriptionService {
     private readonly postService: PostService,
   ) {}
 
-  async subscribe(userId: string, linkedinUrl: string) {
-    const username = this.extractUsername(linkedinUrl);
+  async subscribe(userId: string, username: string) {
 
     const posts = await this.postService.getUserPosts(username, 1);
     if (!posts.length) {
@@ -106,14 +105,4 @@ export class SubscriptionService {
     return this.subscriptionRepository.save(subscription);
   }
 
-  private extractUsername(linkedinUrl: string): string {
-    const match = linkedinUrl.match(/linkedin\.com\/in\/([a-zA-Z0-9_-]+)/);
-    if (match) return match[1];
-
-    const cleaned = linkedinUrl.replace(/\/$/, '').trim();
-    const lastSegment = cleaned.split('/').pop();
-    if (lastSegment) return lastSegment;
-
-    throw new BadRequestException('Invalid LinkedIn URL or username');
-  }
 }
