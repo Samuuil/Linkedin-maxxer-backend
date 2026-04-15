@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { SubscriptionRepository } from './subscription.repository';
 import { CommentSuggestionRepository } from './comment-suggestion.repository';
-import { PostService } from '../linkedin/post/postComment.service';
+import { LinkedinPostService } from '../linkedin/post/postComment.service';
 import { LinkedInUserPost } from '../linkedin/interfaces/linkedin.interface';
 import { OpenAiService } from '../openai';
 import { NotificationService } from '../notification/notification.service';
@@ -18,7 +18,7 @@ export class SubscriptionCronService {
   constructor(
     private readonly subscriptionRepository: SubscriptionRepository,
     private readonly commentSuggestionRepository: CommentSuggestionRepository,
-    private readonly postService: PostService,
+    private readonly postService: LinkedinPostService,
     private readonly openAiService: OpenAiService,
     private readonly notificationService: NotificationService,
     private readonly userService: UserService,
@@ -67,7 +67,7 @@ export class SubscriptionCronService {
     pushToken: string,
     subscription: Subscription,
   ) {
-    const posts = await this.postService.getUserPosts(
+    const posts = await this.postService.getUserOfficialLinkedPosts(
       subscription.linkedinUsername,
     );
 
@@ -103,7 +103,11 @@ export class SubscriptionCronService {
       await this.commentSuggestionRepository.save(suggestion);
 
       if (subscription.autoComment) {
-        await this.postService.commentOnPost(post.url, suggestedComment);
+        await this.postService.commentOnPost(
+          post.url,
+          suggestedComment,
+          subscription.userId,
+        );
       } else if (pushToken) {
         await this.notificationService.sendToToken(
           pushToken,

@@ -3,8 +3,8 @@ import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 export class CommentOnPostDto {
   @ApiProperty({
-    description: 'LinkedIn post URL to comment on',
-    example: 'https://www.linkedin.com/feed/update/urn:li:activity:1234567890/',
+    description: 'LinkedIn post urn to comment on (its the big random number in a post url)',
+    example: '1234567890',
   })
   @IsNotEmpty()
   @IsString()

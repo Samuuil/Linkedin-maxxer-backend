@@ -28,13 +28,18 @@ import {
   PostResponseDto,
 } from './dtos';
 import { Post as PostEntity } from './entities';
+import { LinkedinPostService } from 'src/linkedin/post/postComment.service';
+import { PostStatus } from './enums';
 
 @ApiTags('Posts')
 @Controller('posts')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('AccessToken')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+   constructor(
+    private readonly postsService: PostsService,
+    private readonly linkedInPostService: LinkedinPostService,
+  ) {}
 
   @Post('enhance')
   @ApiOperation({
@@ -91,8 +96,11 @@ export class PostsController {
   @ApiResponse({ status: 201, description: 'Comment published successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async commentOnPost(@Body() dto: CommentOnPostDto) {
-    return this.postsService.commentOnPost(dto);
+  async commentOnPost(
+    @CurrentUser() user: User,
+    @Body() dto: CommentOnPostDto,
+  ) {
+    return this.postsService.commentOnPost(dto, user.id);
   }
 
   @Get(':id')
@@ -118,5 +126,11 @@ export class PostsController {
     return {
       message: 'Post deleted successfully from database (still exists on LinkedIn)',
     };
+  }
+  
+ @Get('official/:username')
+  @ApiOperation({ summary: 'Gets official LinkedIn posts for a user' })
+  async getOfficialPosts(@Param('username') username: string) {
+    return this.linkedInPostService.getUserOfficialLinkedPosts(username);
   }
 }

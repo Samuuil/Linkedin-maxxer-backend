@@ -13,8 +13,8 @@ import { UnipileClient } from 'unipile-node-sdk';
 import { ApifyClient } from 'apify-client';
 
 @Injectable()
-export class PostService {
-  private readonly logger = new Logger(PostService.name);
+export class LinkedinPostService {
+  private readonly logger = new Logger(LinkedinPostService.name);
   private readonly BASE_URL = 'https://api.linkedin.com/v2';
 
   constructor(
@@ -35,8 +35,8 @@ export class PostService {
     });
   }
 
-  async getPost(urn: string) {
-    const activityId = urn
+  async getPost(urn: string, userId: string) {
+    const activityId = urn;
     if (!activityId) {
       throw new Error(
         `Could not extract LinkedIn activity id from URL: ${urn}`,
@@ -44,7 +44,7 @@ export class PostService {
     }
 
     this.logger.debug(`Preparing LinkedIn comment on activity ${activityId}`);
-    const unipileAccessToken = this.getRequiredConfig('UNIPILE_ACCESS_TOKEN');
+    const unipileAccessToken = await this.getUnofficialTokenOrThrow(userId);
     const unipileBaseUrl =
       this.configService.get<string>('UNIPILE_API_URL') ??
       'https://api32.unipile.com:16266';
@@ -56,24 +56,24 @@ export class PostService {
     if (!linkedinAccId) {
       throw new Error('No LinkedIn account found in Unipile');
     }
-    console.log("frijfmr")
+    console.log('frijfmr');
 
     try {
       const res = await unipileClient.users.getPost({
         account_id: linkedinAccId,
         post_id: activityId,
       });
-      console.log("deedde", res)
-      return res
+      console.log('deedde', res);
+      return res;
     } catch (e) {
-      console.log(e)
-      throw new Error(e)
+      console.log(e);
+      throw new Error(e);
     }
   }
 
-  async commentOnPost(urn: string, commentText: string) {
-    const post = await this.getPost(urn);
-    const unipileAccessToken = this.getRequiredConfig('UNIPILE_ACCESS_TOKEN');
+  async commentOnPost(urn: string, commentText: string, userId: string) {
+    const post = await this.getPost(urn, userId);
+    const unipileAccessToken = await this.getUnofficialTokenOrThrow(userId);
     const unipileBaseUrl =
       this.configService.get<string>('UNIPILE_API_URL') ??
       'https://api32.unipile.com:16266';
@@ -97,12 +97,12 @@ export class PostService {
     });
   }
 
-  async getUserPosts(username: string, limit = 3): Promise<LinkedInUserPost[]> {
+  /*
+  paste just the username e.g. radoslav not the full url
+  */
+  public async getUserOfficialLinkedPosts(username: string, limit = 3): Promise<LinkedInUserPost[]> {
     const apifyClient = new ApifyClient({
       token: this.getRequiredConfig('APIFY_API_TOKEN'),
-      baseUrl:
-        this.configService.get<string>('APIFY_API_URL') ??
-        'https://api.apify.com',
     });
 
     const input = { username, limit };
@@ -120,6 +120,16 @@ export class PostService {
       throw new Error(`${key} is not configured`);
     }
     return value;
+  }
+
+  private async getUnofficialTokenOrThrow(userId: string): Promise<string> {
+    const unofficialToken = await this.userService.getUnofficialToken(userId);
+    if (!unofficialToken) {
+      throw new BadRequestException(
+        'User has not connected their LinkedIn account (no unofficial token)',
+      );
+    }
+    return unofficialToken;
   }
 
   async createPost(
