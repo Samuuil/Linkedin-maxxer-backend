@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { SubscriptionRepository } from './subscription.repository';
 import { CommentSuggestionRepository } from './comment-suggestion.repository';
-import { PostService } from '../linkedin/post/postComment.service';
+import { LinkedinPostService } from '../linkedin/post/postComment.service';
 import { CommentSuggestionStatus } from './enums';
 
 @Injectable()
@@ -13,13 +13,13 @@ export class SubscriptionService {
   constructor(
     private readonly subscriptionRepository: SubscriptionRepository,
     private readonly commentSuggestionRepository: CommentSuggestionRepository,
-    private readonly postService: PostService,
+    private readonly postService: LinkedinPostService,
   ) {}
 
   async subscribe(userId: string, linkedinUrl: string) {
     const username = this.extractUsername(linkedinUrl);
 
-    const posts = await this.postService.getUserPosts(username, 1);
+    const posts = await this.postService.getUserOfficialLinkedPosts(username, 1);
     if (!posts.length) {
       throw new BadRequestException('LinkedIn user not found');
     }

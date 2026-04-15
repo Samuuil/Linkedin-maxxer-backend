@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { PostService } from './post/postComment.service';
+import { LinkedinPostService } from './post/postComment.service';
 import { GetFeedService } from './getFeed/getFeed.service';
 import { JwtAuthGuard } from '../auth/guards';
 import { CurrentUser } from '../auth/decorators';
@@ -12,7 +12,7 @@ import { User } from '../user/entities';
 @ApiBearerAuth('AccessToken')
 export class LinkedInController {
   constructor(
-    private postService: PostService,
+    private postService: LinkedinPostService,
     private getFeedService: GetFeedService,
   ) {}
 

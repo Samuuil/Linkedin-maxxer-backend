@@ -13,8 +13,8 @@ import { UnipileClient } from 'unipile-node-sdk';
 import { ApifyClient } from 'apify-client';
 
 @Injectable()
-export class PostService {
-  private readonly logger = new Logger(PostService.name);
+export class LinkedinPostService {
+  private readonly logger = new Logger(LinkedinPostService.name);
   private readonly BASE_URL = 'https://api.linkedin.com/v2';
 
   constructor(
@@ -97,12 +97,12 @@ export class PostService {
     });
   }
 
-  async getUserPosts(username: string, limit = 3): Promise<LinkedInUserPost[]> {
+  /*
+  paste just the username e.g. radoslav not the full url
+  */
+  public async getUserOfficialLinkedPosts(username: string, limit = 3): Promise<LinkedInUserPost[]> {
     const apifyClient = new ApifyClient({
       token: this.getRequiredConfig('APIFY_API_TOKEN'),
-      baseUrl:
-        this.configService.get<string>('APIFY_API_URL') ??
-        'https://api.apify.com',
     });
 
     const input = { username, limit };

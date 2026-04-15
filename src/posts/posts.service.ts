@@ -11,7 +11,7 @@ import {
 } from 'nestjs-paginate';
 import type { PaginateQuery, Paginated } from 'nestjs-paginate';
 import { Repository } from 'typeorm';
-import { PostService as LinkedInPostService } from '../linkedin/post/postComment.service';
+import { LinkedinPostService as LinkedInPostService } from '../linkedin/post/postComment.service';
 import { OpenAiService } from '../openai';
 import { CommentOnPostDto, CreatePostDto } from './dtos';
 import { Post } from './entities';

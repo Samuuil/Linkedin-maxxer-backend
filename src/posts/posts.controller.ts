@@ -28,13 +28,18 @@ import {
   PostResponseDto,
 } from './dtos';
 import { Post as PostEntity } from './entities';
+import { LinkedinPostService } from 'src/linkedin/post/postComment.service';
+import { PostStatus } from './enums';
 
 @ApiTags('Posts')
 @Controller('posts')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('AccessToken')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+   constructor(
+    private readonly postsService: PostsService,
+    private readonly linkedInPostService: LinkedinPostService,
+  ) {}
 
   @Post('enhance')
   @ApiOperation({
@@ -121,5 +126,11 @@ export class PostsController {
     return {
       message: 'Post deleted successfully from database (still exists on LinkedIn)',
     };
+  }
+  
+ @Get('official/:username')
+  @ApiOperation({ summary: 'Gets official LinkedIn posts for a user' })
+  async getOfficialPosts(@Param('username') username: string) {
+    return this.linkedInPostService.getUserOfficialLinkedPosts(username);
   }
 }
