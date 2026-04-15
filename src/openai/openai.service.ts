@@ -53,7 +53,11 @@ export class OpenAiService {
   }
 
   private readPrompt(filename: string): string {
-    const promptPath = path.resolve(process.cwd(), 'prompts', filename);
-    return fs.readFileSync(promptPath, 'utf-8');
+    // __dirname in compiled output: dist/openai/ → go up two levels to project root
+    const promptPath = path.resolve(__dirname, '../../prompts', filename);
+    this.logger.log(`Loading prompt from: ${promptPath}`);
+    const content = fs.readFileSync(promptPath, 'utf-8');
+    this.logger.log(`Loaded prompt "${filename}": ${content.length} chars`);
+    return content;
   }
 }
