@@ -67,14 +67,42 @@ export class SubscriptionCronService {
     pushToken: string,
     subscription: Subscription,
   ) {
+    this.logger.log(
+      `Processing subscription for user=${subscription.userId} linkedin=${subscription.linkedinUsername}`,
+    );
+
     const posts = await this.postService.getUserOfficialLinkedPosts(
       subscription.linkedinUsername,
     );
 
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
-    const recentPosts = posts.filter(
-      (post: LinkedInUserPost) =>
-        new Date(post.posted_at.timestamp) > fifteenMinutesAgo,
+    this.logger.log(
+      `Fetched ${posts.length} posts for ${subscription.linkedinUsername}`,
+    );
+
+    if (posts.length > 0) {
+      const sample = posts[0];
+      this.logger.debug(
+        `First post raw timestamp=${sample.posted_at?.timestamp} parsed=${new Date(sample.posted_at?.timestamp)} url=${sample.url}`,
+      );
+    }
+
+    const now = Date.now();
+    const fifteenMinutesAgo = new Date(now - 15 * 60 * 1000);
+
+    const recentPosts = posts.filter((post: LinkedInUserPost) => {
+      const raw = post.posted_at?.timestamp;
+      // LinkedIn may return seconds; normalise to ms if the value looks like seconds
+      const ms = raw > 1e12 ? raw : raw * 1000;
+      const postDate = new Date(ms);
+      const isRecent = postDate > fifteenMinutesAgo;
+      this.logger.debug(
+        `Post url=${post.url} raw=${raw} ms=${ms} postDate=${postDate.toISOString()} isRecent=${isRecent}`,
+      );
+      return isRecent;
+    });
+
+    this.logger.log(
+      `${recentPosts.length} recent post(s) found for ${subscription.linkedinUsername}`,
     );
 
     for (const post of recentPosts) {
@@ -83,6 +111,11 @@ export class SubscriptionCronService {
           subscription.userId,
           post.url,
         );
+
+      this.logger.log(
+        `Post ${post.url} alreadyProcessed=${alreadyProcessed}`,
+      );
+
       if (alreadyProcessed) continue;
 
       const suggestedComment = await this.openAiService.generateComment(
@@ -103,18 +136,26 @@ export class SubscriptionCronService {
       await this.commentSuggestionRepository.save(suggestion);
 
       if (subscription.autoComment) {
+        this.logger.log(`Auto-commenting on post ${post.url}`);
         await this.postService.commentOnPost(
           post.url,
           suggestedComment,
           subscription.userId,
         );
       } else if (pushToken) {
+        this.logger.log(
+          `Sending push notification to token ${pushToken} for post ${post.url}`,
+        );
         await this.notificationService.sendToToken(
           pushToken,
           'New Comment Suggestion',
           `New post from ${subscription.linkedinUsername}: "${post.text.substring(0, 100)}..."`,
           NotificationTypeEnum.CommentSuggestion,
           { suggestionId: suggestion.id },
+        );
+      } else {
+        this.logger.warn(
+          `No push token for user=${subscription.userId}, skipping notification`,
         );
       }
     }
