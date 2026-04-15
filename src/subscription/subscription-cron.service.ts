@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { SubscriptionRepository } from './subscription.repository';
 import { CommentSuggestionRepository } from './comment-suggestion.repository';
@@ -12,7 +12,7 @@ import { Subscription } from './entities';
 import { CommentSuggestionStatus } from './enums';
 
 @Injectable()
-export class SubscriptionCronService {
+export class SubscriptionCronService implements OnApplicationBootstrap {
   private readonly logger = new Logger(SubscriptionCronService.name);
 
   constructor(
@@ -23,6 +23,10 @@ export class SubscriptionCronService {
     private readonly notificationService: NotificationService,
     private readonly userService: UserService,
   ) {}
+
+  async onApplicationBootstrap() {
+    await this.processSubscriptions();
+  }
 
   @Cron('0 */5 * * * *')
   async processSubscriptions() {
