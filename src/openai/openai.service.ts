@@ -18,11 +18,14 @@ export class OpenAiService {
 
     this.commentPrompt = this.readPrompt('comment-prompt.txt');
     this.postDescriptionPrompt = this.readPrompt('post-description-prompt.txt');
+
+    this.logger.log(`comment-prompt starts with: "${this.commentPrompt.substring(0, 80)}"`);
+    this.logger.log(`post-description-prompt starts with: "${this.postDescriptionPrompt.substring(0, 80)}"`);
   }
 
   async generateComment(postDescription: string): Promise<string> {
     this.logger.debug(`Generating comment for post: "${postDescription.substring(0, 100)}..."`);
-    this.logger.debug(`Using system prompt (${this.commentPrompt.length} chars)`);
+    this.logger.debug(`Using system prompt: "${this.commentPrompt.substring(0, 80)}"`);
 
     const response = await this.client.chat.completions.create({
       model: 'gpt-4o-mini',
