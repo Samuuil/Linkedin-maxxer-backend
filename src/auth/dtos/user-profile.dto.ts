@@ -14,7 +14,7 @@ export class UserProfileDto {
   linkedinSub?: string;
 
   @ApiPropertyOptional({ description: 'Push token' })
-  pushToken?: string;
+  pushToken?: string | null;
 
   @ApiProperty({ description: 'Account creation date' })
   createdAt: Date;

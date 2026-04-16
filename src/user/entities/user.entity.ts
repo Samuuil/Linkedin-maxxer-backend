@@ -26,7 +26,7 @@ export class User {
   linkedinSub: string;
 
   @Column({ name: 'push_token', nullable: true })
-  pushToken: string;
+  pushToken: string | null;
 
   @Column({ name: 'oficial_token', nullable: true })
   oficialToken: string;

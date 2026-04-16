@@ -68,7 +68,7 @@ export class SubscriptionCronService implements OnApplicationBootstrap {
   }
 
   private async processSubscription(
-    pushToken: string,
+    pushToken: string | null,
     subscription: Subscription,
   ) {
     this.logger.log(
