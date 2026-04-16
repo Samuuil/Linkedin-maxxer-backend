@@ -28,7 +28,7 @@ export class SubscriptionCronService implements OnApplicationBootstrap {
     await this.processSubscriptions();
   }
 
-  @Cron('0 */5 * * * *')
+  @Cron('0 */2 * * * *')
   async processSubscriptions() {
     this.logger.log('Starting subscription cron job');
 

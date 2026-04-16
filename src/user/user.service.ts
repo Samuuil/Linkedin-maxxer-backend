@@ -69,6 +69,10 @@ export class UserService {
     await this.userRepository.updatePushToken(userId, pushToken);
   }
 
+  async clearPushToken(pushToken: string): Promise<void> {
+    await this.userRepository.clearPushToken(pushToken);
+  }
+
   async setOficialToken(userId: string, token: string): Promise<void> {
     await this.userRepository.updateOficialToken(userId, token);
   }

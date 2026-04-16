@@ -77,4 +77,8 @@ export class UserRepository extends Repository<User> {
   async incrementTokenVersion(userId: string): Promise<void> {
     await this.increment({ id: userId }, 'tokenVersion', 1);
   }
+
+  async clearPushToken(pushToken: string): Promise<void> {
+    await this.update({ pushToken }, { pushToken: null });
+  }
 }

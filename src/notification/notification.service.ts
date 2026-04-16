@@ -1,12 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FirebaseAdminService } from './firebase-admin.service';
 import { NotificationTypeEnum } from './enums';
+import { UserService } from '../user';
 
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
 
-  constructor(private readonly firebaseAdminService: FirebaseAdminService) {}
+  constructor(
+    private readonly firebaseAdminService: FirebaseAdminService,
+    private readonly userService: UserService,
+  ) {}
 
   /**
    * Send a notification to a single device token
@@ -36,6 +40,10 @@ export class NotificationService {
       return { success: true };
     } catch (error) {
       this.logger.error('Failed to send notification:', error);
+      if (error?.errorInfo?.code === 'messaging/registration-token-not-registered') {
+        this.logger.warn(`Clearing stale push token: ${token}`);
+        await this.userService.clearPushToken(token);
+      }
       throw error;
     }
   }
