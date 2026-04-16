@@ -25,7 +25,7 @@ export class User {
   @Column({ name: 'linkedin_sub', unique: true, nullable: true })
   linkedinSub: string;
 
-  @Column({ name: 'push_token', nullable: true })
+  @Column({ name: 'push_token', nullable: true, type: 'varchar' })
   pushToken: string | null;
 
   @Column({ name: 'oficial_token', nullable: true })
